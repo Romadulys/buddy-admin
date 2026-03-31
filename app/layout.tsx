@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import Sidebar from '@/components/Sidebar'
+import LayoutShell from '@/components/LayoutShell'
 
 export const metadata: Metadata = {
   title: 'Buddy Admin — GPS Tracker Dashboard',
@@ -15,12 +15,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className="h-full">
       <body className="h-full bg-slate-50 antialiased">
-        <div className="flex h-full">
-          <Sidebar />
-          <main className="flex-1 ml-64 min-h-full overflow-auto">
-            {children}
-          </main>
-        </div>
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   )
