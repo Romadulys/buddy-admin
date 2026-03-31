@@ -17,6 +17,8 @@ const b2bItems = [
   { href: '/b2b/clients', label: 'Clients B2B', icon: '🏢' },
   { href: '/b2b/orders', label: 'Commandes', icon: '📦' },
   { href: '/b2b/deliveries', label: 'Livraisons', icon: '🚚' },
+  { href: '/b2b/stock', label: 'Stock & Arrivages', icon: '📊' },
+  { href: '/b2b/simulator', label: 'Simulateur', icon: '🧮' },
 ]
 
 export default function Sidebar() {
