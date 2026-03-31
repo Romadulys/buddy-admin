@@ -1,4 +1,5 @@
 import SupportClient from './SupportClient'
+import SOSAlerts from './SOSAlerts'
 
 const MOCK_TICKETS = [
   {
@@ -93,6 +94,18 @@ export default function SupportPage() {
             <p className="text-2xl font-bold mt-1">{s.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* SOS Alerts — top priority section */}
+      <div className="bg-red-50 border border-red-100 rounded-xl p-5">
+        <SOSAlerts />
+      </div>
+
+      {/* Separator */}
+      <div className="flex items-center gap-3 pt-1">
+        <div className="flex-1 border-t border-gray-200" />
+        <span className="text-xs text-gray-400 font-medium">Tickets support</span>
+        <div className="flex-1 border-t border-gray-200" />
       </div>
 
       <SupportClient tickets={MOCK_TICKETS} />

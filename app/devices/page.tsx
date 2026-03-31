@@ -1,7 +1,10 @@
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
 const MOCK_CITIES = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Toulouse', 'Nantes', 'Strasbourg', 'Lille', 'Nice', 'Rennes']
 const DEVICE_TYPES = ['Buddy Mini', 'Buddy Big', 'Buddy Mini', 'Buddy Mini', 'Buddy Big']
+const NFC_STATUSES = ['active', 'active', 'inactive', 'active', 'inactive']
+const NFC_BALANCES = [4.50, 2.10, 0.00, 7.80, 1.30]
 
 function generateMockDevices(users: { id: string; email: string }[]) {
   // Generate mock devices — roughly 80% of users have a device
@@ -16,6 +19,8 @@ function generateMockDevices(users: { id: string; email: string }[]) {
       lastContact: new Date(lastContactMs),
       status: isOnline ? 'online' : 'offline',
       userId: user.id,
+      nfcStatus: NFC_STATUSES[idx % NFC_STATUSES.length],
+      nfcBalance: NFC_BALANCES[idx % NFC_BALANCES.length],
     }
   })
 }
@@ -81,6 +86,8 @@ export default async function DevicesPage() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Ville</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Dernier contact</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Statut</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">NFC</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -127,6 +134,28 @@ export default async function DevicesPage() {
                       <span className={`w-1.5 h-1.5 rounded-full ${device.status === 'online' ? 'bg-green-500' : 'bg-red-500'}`} />
                       {device.status === 'online' ? 'En ligne' : 'Hors ligne'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        device.nfcStatus === 'active'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {device.nfcStatus === 'active' ? '💳 NFC Actif' : 'NFC Inactif'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        Solde: {device.nfcBalance.toFixed(2).replace('.', ',')}€
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/devices/${device.deviceId}`}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium rounded-lg transition-colors"
+                    >
+                      Détails →
+                    </Link>
                   </td>
                 </tr>
               ))}
