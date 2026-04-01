@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server'
 import { Client } from 'pg'
 import path from 'path'
 import fs from 'fs'
-import dns from 'dns/promises'
 
 // Protection: require a secret token
 const MIGRATION_SECRET = process.env.MIGRATION_SECRET || 'buddy-migrate-2026'
 
 const PROJECT_REF = 'zkqnydmlvueaosxykwmc'
-const DB_HOSTNAME = `db.${PROJECT_REF}.supabase.co`
 
 export async function POST(request: Request) {
   // Auth check
@@ -26,26 +24,16 @@ export async function POST(request: Request) {
     )
   }
 
-  // Resolve IPv4 and IPv6 — Supabase free tier is IPv6 only
-  let host = DB_HOSTNAME
-  try {
-    const ipv6 = await dns.resolve6(DB_HOSTNAME)
-    if (ipv6.length > 0) host = ipv6[0]
-  } catch {
-    try {
-      const ipv4 = await dns.resolve4(DB_HOSTNAME)
-      if (ipv4.length > 0) host = ipv4[0]
-    } catch { /* use hostname */ }
-  }
-
+  // Use Supabase Session Pooler (IPv4 accessible, supports DDL)
+  // Transaction pooler port 6543, Session pooler port 5432
   const client = new Client({
-    host,
+    host: `aws-0-eu-west-3.pooler.supabase.com`,
     port: 5432,
-    user: 'postgres',
+    user: `postgres.${PROJECT_REF}`,
     password,
     database: 'postgres',
     ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 15000,
+    connectionTimeoutMillis: 20000,
   })
 
   try {
@@ -62,6 +50,6 @@ export async function POST(request: Request) {
     const msg = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: msg }, { status: 500 })
   } finally {
-    await client.end()
+    await client.end().catch(() => {})
   }
 }
