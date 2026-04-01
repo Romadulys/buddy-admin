@@ -3,9 +3,9 @@ import { supabase } from '@/lib/supabase'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params
+  const { id } = await params
   const body = await req.json()
 
   const allowed = ['published', 'featured', 'display_order']
@@ -29,9 +29,9 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params
+  const { id } = await params
 
   const { error } = await supabase.from('reviews').delete().eq('id', id)
 
