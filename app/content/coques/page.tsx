@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 type Coque = {
   id: string

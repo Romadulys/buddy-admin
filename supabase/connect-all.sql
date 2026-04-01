@@ -1,6 +1,6 @@
 -- =========================================================
 -- BUDDY — Migration complète : connexion web ↔ admin
--- À exécuter dans Supabase SQL Editor
+-- Compatible Postgres 14+  (pas de CREATE POLICY IF NOT EXISTS)
 -- =========================================================
 
 -- ── 1. FAQ items ──────────────────────────────────────────
@@ -26,10 +26,24 @@ CREATE TRIGGER trg_faq_updated_at
   FOR EACH ROW EXECUTE FUNCTION update_faq_updated_at();
 
 ALTER TABLE faq_items ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read published FAQs"
-  ON faq_items FOR SELECT USING (published = true);
-CREATE POLICY IF NOT EXISTS "Service role full access"
-  ON faq_items FOR ALL USING (true);
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='faq_items' AND policyname='Public read published FAQs'
+  ) THEN
+    CREATE POLICY "Public read published FAQs"
+      ON faq_items FOR SELECT USING (published = true);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='faq_items' AND policyname='Service role full access'
+  ) THEN
+    CREATE POLICY "Service role full access"
+      ON faq_items FOR ALL USING (true);
+  END IF;
+END $$;
 
 -- ── 2. Orders (commandes web) ─────────────────────────────
 CREATE TABLE IF NOT EXISTS orders (
@@ -48,12 +62,33 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Anyone can insert orders"
-  ON orders FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "Service role read all orders"
-  ON orders FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "Service role update orders"
-  ON orders FOR UPDATE USING (true);
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='orders' AND policyname='Anyone can insert orders'
+  ) THEN
+    CREATE POLICY "Anyone can insert orders"
+      ON orders FOR INSERT WITH CHECK (true);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='orders' AND policyname='Service role read all orders'
+  ) THEN
+    CREATE POLICY "Service role read all orders"
+      ON orders FOR SELECT USING (true);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='orders' AND policyname='Service role update orders'
+  ) THEN
+    CREATE POLICY "Service role update orders"
+      ON orders FOR UPDATE USING (true);
+  END IF;
+END $$;
 
 -- ── 3. Reviews (avis clients) ─────────────────────────────
 CREATE TABLE IF NOT EXISTS reviews (
@@ -70,10 +105,24 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read published reviews"
-  ON reviews FOR SELECT USING (published = true);
-CREATE POLICY IF NOT EXISTS "Service role full access reviews"
-  ON reviews FOR ALL USING (true);
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='reviews' AND policyname='Public read published reviews'
+  ) THEN
+    CREATE POLICY "Public read published reviews"
+      ON reviews FOR SELECT USING (published = true);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='reviews' AND policyname='Service role full access reviews'
+  ) THEN
+    CREATE POLICY "Service role full access reviews"
+      ON reviews FOR ALL USING (true);
+  END IF;
+END $$;
 
 -- ── 4. Coques catalog ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS coques (
@@ -96,10 +145,24 @@ CREATE TABLE IF NOT EXISTS coques (
 );
 
 ALTER TABLE coques ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read active coques"
-  ON coques FOR SELECT USING (active = true);
-CREATE POLICY IF NOT EXISTS "Service role full access coques"
-  ON coques FOR ALL USING (true);
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='coques' AND policyname='Public read active coques'
+  ) THEN
+    CREATE POLICY "Public read active coques"
+      ON coques FOR SELECT USING (active = true);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename='coques' AND policyname='Service role full access coques'
+  ) THEN
+    CREATE POLICY "Service role full access coques"
+      ON coques FOR ALL USING (true);
+  END IF;
+END $$;
 
 -- ── 5. Seed: FAQ items (25 Q&A) ───────────────────────────
 INSERT INTO faq_items (question, answer, category, published, display_order) VALUES

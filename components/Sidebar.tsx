@@ -2,15 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const navItems = [
+const mainItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/clients', label: 'Clients', icon: '👥' },
   { href: '/devices', label: 'Appareils', icon: '📱' },
   { href: '/subscriptions', label: 'Abonnements', icon: '💳' },
   { href: '/referral', label: 'Parrainage', icon: '🎁' },
   { href: '/support', label: 'Support', icon: '🎧' },
+]
+
+const commandesItems = [
+  { href: '/commandes', label: 'Précommandes web', icon: '🛒' },
 ]
 
 const b2bItems = [
@@ -21,24 +25,88 @@ const b2bItems = [
   { href: '/b2b/simulator', label: 'Simulateur', icon: '🧮' },
 ]
 
-const commandesItems = [
-  { href: '/commandes', label: 'Commandes', icon: '🛒' },
-]
-
 const contentItems = [
   { href: '/content/faq', label: 'FAQ', icon: '❓' },
-  { href: '/content/reviews', label: 'Avis', icon: '⭐' },
+  { href: '/content/reviews', label: 'Avis clients', icon: '⭐' },
   { href: '/content/coques', label: 'Coques', icon: '🎨' },
 ]
 
-export default function Sidebar() {
+type SectionKey = 'commandes' | 'b2b' | 'content'
+
+function NavLink({ href, icon, label }: { href: string; icon: string; label: string }) {
   const pathname = usePathname()
+  const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href + '/'))
+
+  return (
+    <Link
+      href={href}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+        isActive
+          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
+          : 'text-slate-300 hover:bg-white/10 hover:text-white'
+      }`}
+    >
+      <span className="text-base">{icon}</span>
+      {label}
+      {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />}
+    </Link>
+  )
+}
+
+function SectionHeader({
+  label,
+  open,
+  onToggle,
+}: {
+  label: string
+  open: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between px-0 py-1 group"
+    >
+      <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest group-hover:text-slate-400 transition-colors">
+        {label}
+      </p>
+      <span
+        className={`text-slate-600 text-[10px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+      >
+        ▼
+      </span>
+    </button>
+  )
+}
+
+export default function Sidebar() {
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
 
-  const handleSignOut = async () => {
+  // Collapsible section states — persisted in localStorage
+  const [open, setOpen] = useState<Record<SectionKey, boolean>>({
+    commandes: true,
+    b2b: true,
+    content: true,
+  })
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('buddy_sidebar_open')
+      if (saved) setOpen(JSON.parse(saved))
+    } catch {}
+  }, [])
+
+  const toggle = (key: SectionKey) => {
+    setOpen((prev) => {
+      const next = { ...prev, [key]: !prev[key] }
+      try { localStorage.setItem('buddy_sidebar_open', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
+  const handleSignOut = () => {
     setSigningOut(true)
-    // Clear admin session cookie
     document.cookie = 'admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
     router.push('/login')
   }
@@ -57,128 +125,54 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        <div className="space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />
-                )}
-              </Link>
-            )
-          })}
-        </div>
+      <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">
+        {/* Main */}
+        {mainItems.map((item) => (
+          <NavLink key={item.href} {...item} />
+        ))}
 
-        {/* Commandes Section */}
-        <div className="my-4 px-3">
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 px-0">
-              Précommandes
-            </p>
+        {/* ── Précommandes ── */}
+        <div className="pt-4 pb-1 px-3">
+          <SectionHeader label="Précommandes" open={open.commandes} onToggle={() => toggle('commandes')} />
+        </div>
+        {open.commandes && (
+          <div className="space-y-1">
+            {commandesItems.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </div>
+        )}
+
+        {/* ── B2B & Distribution ── */}
+        <div className="pt-4 pb-1 px-3">
+          <div className="border-t border-white/10 pt-3">
+            <SectionHeader label="B2B & Distribution" open={open.b2b} onToggle={() => toggle('b2b')} />
           </div>
         </div>
+        {open.b2b && (
+          <div className="space-y-1">
+            {b2bItems.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </div>
+        )}
 
-        <div className="space-y-1">
-          {commandesItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />
-                )}
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* B2B Section Divider */}
-        <div className="my-4 px-3">
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 px-0">
-              B2B &amp; Distribution
-            </p>
+        {/* ── Contenu & SEO ── */}
+        <div className="pt-4 pb-1 px-3">
+          <div className="border-t border-white/10 pt-3">
+            <SectionHeader label="Contenu & SEO" open={open.content} onToggle={() => toggle('content')} />
           </div>
         </div>
-
-        <div className="space-y-1">
-          {b2bItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />
-                )}
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* Contenu & SEO Section Divider */}
-        <div className="my-4 px-3">
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 px-0">
-              Contenu &amp; SEO
-            </p>
+        {open.content && (
+          <div className="space-y-1">
+            {contentItems.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
           </div>
-        </div>
-
-        <div className="space-y-1">
-          {contentItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
-                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />
-                )}
-              </Link>
-            )
-          })}
-        </div>
+        )}
       </nav>
 
-      {/* Bottom section */}
+      {/* Bottom */}
       <div className="px-3 py-4 border-t border-white/10">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
           <div className="w-8 h-8 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm">
