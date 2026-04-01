@@ -68,12 +68,12 @@ CREATE TABLE IF NOT EXISTS b2b_deliveries (
 );
 
 -- ============================================================
--- Row Level Security (enable after testing)
+-- Row Level Security (service role bypasses RLS → admin always works)
 -- ============================================================
--- ALTER TABLE b2b_clients ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE b2b_orders ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE b2b_order_items ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE b2b_deliveries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_deliveries ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================
 -- Indexes for performance
