@@ -21,8 +21,14 @@ const b2bItems = [
   { href: '/b2b/simulator', label: 'Simulateur', icon: '🧮' },
 ]
 
+const commandesItems = [
+  { href: '/commandes', label: 'Commandes', icon: '🛒' },
+]
+
 const contentItems = [
   { href: '/content/faq', label: 'FAQ', icon: '❓' },
+  { href: '/content/reviews', label: 'Avis', icon: '⭐' },
+  { href: '/content/coques', label: 'Coques', icon: '🎨' },
 ]
 
 export default function Sidebar() {
@@ -54,6 +60,38 @@ export default function Sidebar() {
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <div className="space-y-1">
           {navItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
+                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="text-base">{item.icon}</span>
+                {item.label}
+                {isActive && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300" />
+                )}
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Commandes Section */}
+        <div className="my-4 px-3">
+          <div className="border-t border-white/10 pt-4">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 px-0">
+              Précommandes
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          {commandesItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
             return (
               <Link
