@@ -1,5 +1,11 @@
+'use client'
+
+export const dynamic = 'force-dynamic'
+
+import { useState } from 'react'
 import SupportClient from './SupportClient'
 import SOSAlerts from './SOSAlerts'
+import ChatInbox from './ChatInbox'
 
 const MOCK_TICKETS = [
   {
@@ -58,11 +64,21 @@ const MOCK_TICKETS = [
   },
 ]
 
+type Tab = 'messagerie' | 'tickets' | 'sos'
+
 export default function SupportPage() {
+  const [activeTab, setActiveTab] = useState<Tab>('messagerie')
+
   const openCount = MOCK_TICKETS.filter((t) => t.status === 'Ouvert').length
   const inProgressCount = MOCK_TICKETS.filter((t) => t.status === 'En cours').length
   const resolvedCount = MOCK_TICKETS.filter((t) => t.status === 'Résolu').length
   const urgentCount = MOCK_TICKETS.filter((t) => t.priority === 'Urgent').length
+
+  const tabs: { key: Tab; label: string; icon: string }[] = [
+    { key: 'messagerie', label: 'Messagerie', icon: '💬' },
+    { key: 'tickets',    label: 'Tickets',    icon: '🎫' },
+    { key: 'sos',        label: 'SOS',        icon: '⚠️' },
+  ]
 
   return (
     <div className="p-6 space-y-5">
@@ -70,7 +86,7 @@ export default function SupportPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Support</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{MOCK_TICKETS.length} tickets actifs</p>
+          <p className="text-sm text-gray-500 mt-0.5">{MOCK_TICKETS.length} tickets · messagerie live</p>
         </div>
         <div className="flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 font-medium text-blue-700">
           <span>🚀</span>
@@ -81,10 +97,10 @@ export default function SupportPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Ouverts', value: openCount, color: 'bg-orange-50 text-orange-600 border-orange-200', icon: '📬' },
-          { label: 'En cours', value: inProgressCount, color: 'bg-blue-50 text-blue-600 border-blue-200', icon: '🔄' },
-          { label: 'Résolus', value: resolvedCount, color: 'bg-green-50 text-green-600 border-green-200', icon: '✅' },
-          { label: 'Urgents', value: urgentCount, color: 'bg-red-50 text-red-600 border-red-200', icon: '🚨' },
+          { label: 'Ouverts',  value: openCount,       color: 'bg-orange-50 text-orange-600 border-orange-200', icon: '📬' },
+          { label: 'En cours', value: inProgressCount,  color: 'bg-blue-50 text-blue-600 border-blue-200',       icon: '🔄' },
+          { label: 'Résolus',  value: resolvedCount,   color: 'bg-green-50 text-green-600 border-green-200',     icon: '✅' },
+          { label: 'Urgents',  value: urgentCount,     color: 'bg-red-50 text-red-600 border-red-200',           icon: '🚨' },
         ].map((s) => (
           <div key={s.label} className={`${s.color} rounded-xl p-4 border`}>
             <div className="flex items-center justify-between">
@@ -96,19 +112,46 @@ export default function SupportPage() {
         ))}
       </div>
 
-      {/* SOS Alerts — top priority section */}
-      <div className="bg-red-50 border border-red-100 rounded-xl p-5">
-        <SOSAlerts />
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? 'border-indigo-600 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Separator */}
-      <div className="flex items-center gap-3 pt-1">
-        <div className="flex-1 border-t border-gray-200" />
-        <span className="text-xs text-gray-400 font-medium">Tickets support</span>
-        <div className="flex-1 border-t border-gray-200" />
-      </div>
+      {/* Tab content */}
+      {activeTab === 'messagerie' && (
+        <section>
+          <h2 className="text-base font-semibold text-gray-800 mb-3">Messagerie live</h2>
+          <ChatInbox />
+        </section>
+      )}
 
-      <SupportClient tickets={MOCK_TICKETS} />
+      {activeTab === 'tickets' && (
+        <section>
+          <SupportClient tickets={MOCK_TICKETS} />
+        </section>
+      )}
+
+      {activeTab === 'sos' && (
+        <section className="bg-amber-50 border border-amber-100 rounded-xl p-5">
+          <h2 className="text-base font-semibold text-gray-800 mb-3">Alertes SOS</h2>
+          <SOSAlerts />
+        </section>
+      )}
     </div>
   )
 }
