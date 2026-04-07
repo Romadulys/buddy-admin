@@ -18,6 +18,7 @@ const commandesItems = [
 ]
 
 const b2bItems = [
+  { href: '/b2b/pipeline', label: 'Pipeline', icon: '🎯' },
   { href: '/b2b/clients', label: 'Clients B2B', icon: '🏢' },
   { href: '/b2b/orders', label: 'Commandes', icon: '📦' },
   { href: '/b2b/deliveries', label: 'Livraisons', icon: '🚚' },
