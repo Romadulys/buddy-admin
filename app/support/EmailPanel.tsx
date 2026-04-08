@@ -29,7 +29,7 @@ export default function EmailPanel({
 
   function handleSendReply() {
     onUpdate(email.id, {
-      statut: 'repondu',
+      statut: 'resolu',
       repondu_at: new Date().toISOString(),
       repondu_par: 'Romain',
     })
