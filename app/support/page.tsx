@@ -6,6 +6,8 @@ import { useState } from 'react'
 import SupportClient from './SupportClient'
 import SOSAlerts from './SOSAlerts'
 import ChatInbox from './ChatInbox'
+import EmailInbox from './EmailInbox'
+import EmailDashboard from './EmailDashboard'
 
 const MOCK_TICKETS = [
   {
@@ -64,10 +66,11 @@ const MOCK_TICKETS = [
   },
 ]
 
-type Tab = 'messagerie' | 'tickets' | 'sos'
+type Tab = 'inbox' | 'messagerie' | 'tickets' | 'sos'
 
 export default function SupportPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('messagerie')
+  const [activeTab, setActiveTab] = useState<Tab>('inbox')
+  const [showDashboard, setShowDashboard] = useState(false)
 
   const openCount = MOCK_TICKETS.filter((t) => t.status === 'Ouvert').length
   const inProgressCount = MOCK_TICKETS.filter((t) => t.status === 'En cours').length
@@ -75,6 +78,7 @@ export default function SupportPage() {
   const urgentCount = MOCK_TICKETS.filter((t) => t.priority === 'Urgent').length
 
   const tabs: { key: Tab; label: string; icon: string }[] = [
+    { key: 'inbox',      label: 'Inbox',      icon: '📧' },
     { key: 'messagerie', label: 'Messagerie', icon: '💬' },
     { key: 'tickets',    label: 'Tickets',    icon: '🎫' },
     { key: 'sos',        label: 'SOS',        icon: '⚠️' },
@@ -90,7 +94,7 @@ export default function SupportPage() {
         </div>
         <div className="flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 font-medium text-blue-700">
           <span>🚀</span>
-          Chatbot IA en cours d&apos;intégration — Claude API
+          Email Intelligence Hub — Phase 1
         </div>
       </div>
 
@@ -133,6 +137,23 @@ export default function SupportPage() {
       </div>
 
       {/* Tab content */}
+      {activeTab === 'inbox' && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-gray-800">
+              {showDashboard ? 'Dashboard Analytics' : 'Inbox'}
+            </h2>
+            <button
+              onClick={() => setShowDashboard(!showDashboard)}
+              className="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {showDashboard ? '← Retour' : '📊 Dashboard'}
+            </button>
+          </div>
+          {showDashboard ? <EmailDashboard /> : <EmailInbox />}
+        </section>
+      )}
+
       {activeTab === 'messagerie' && (
         <section>
           <h2 className="text-base font-semibold text-gray-800 mb-3">Messagerie live</h2>
