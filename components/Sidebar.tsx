@@ -4,35 +4,36 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
-const mainItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/clients', label: 'Clients', icon: '👥' },
-  { href: '/devices', label: 'Appareils', icon: '📱' },
-  { href: '/subscriptions', label: 'Abonnements', icon: '💳' },
-  { href: '/referral', label: 'Parrainage', icon: '🎁' },
-  { href: '/support', label: 'Support', icon: '🎧' },
+// ─── Navigation items ────────────────────────────────────────────────────────
+
+const b2cMain = [
+  { href: '/dashboard',     label: 'Dashboard',      icon: '📊' },
+  { href: '/clients',       label: 'Clients',        icon: '👥' },
+  { href: '/devices',       label: 'Appareils',      icon: '📱' },
+  { href: '/subscriptions', label: 'Abonnements',    icon: '💳' },
+  { href: '/commandes',     label: 'Précommandes',   icon: '🛒' },
+  { href: '/referral',      label: 'Parrainage',     icon: '🎁' },
+  { href: '/support',       label: 'Support',        icon: '🎧' },
 ]
 
-const commandesItems = [
-  { href: '/commandes', label: 'Précommandes web', icon: '🛒' },
+const b2cContent = [
+  { href: '/content/faq',     label: 'FAQ',          icon: '❓' },
+  { href: '/content/reviews', label: 'Avis clients', icon: '⭐' },
+  { href: '/content/coques',  label: 'Coques',       icon: '🎨' },
 ]
 
 const b2bItems = [
-  { href: '/b2b/pipeline', label: 'Pipeline', icon: '🎯' },
-  { href: '/b2b/clients', label: 'Clients B2B', icon: '🏢' },
-  { href: '/b2b/orders', label: 'Commandes', icon: '📦' },
-  { href: '/b2b/deliveries', label: 'Livraisons', icon: '🚚' },
-  { href: '/b2b/stock', label: 'Stock & Arrivages', icon: '📊' },
-  { href: '/b2b/simulator', label: 'Simulateur', icon: '🧮' },
+  { href: '/b2b/pipeline',   label: 'Pipeline',          icon: '🎯' },
+  { href: '/b2b/clients',    label: 'Clients B2B',       icon: '🏢' },
+  { href: '/b2b/orders',     label: 'Commandes',         icon: '📦' },
+  { href: '/b2b/deliveries', label: 'Livraisons',        icon: '🚚' },
+  { href: '/b2b/stock',      label: 'Stock & Arrivages', icon: '🗃️' },
+  { href: '/b2b/simulator',  label: 'Simulateur',        icon: '🧮' },
 ]
 
-const contentItems = [
-  { href: '/content/faq', label: 'FAQ', icon: '❓' },
-  { href: '/content/reviews', label: 'Avis clients', icon: '⭐' },
-  { href: '/content/coques', label: 'Coques', icon: '🎨' },
-]
+type Mode = 'b2c' | 'b2b'
 
-type SectionKey = 'commandes' | 'b2b' | 'content'
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function NavLink({ href, icon, label }: { href: string; icon: string; label: string }) {
   const pathname = usePathname()
@@ -54,56 +55,32 @@ function NavLink({ href, icon, label }: { href: string; icon: string; label: str
   )
 }
 
-function SectionHeader({
-  label,
-  open,
-  onToggle,
-}: {
-  label: string
-  open: boolean
-  onToggle: () => void
-}) {
+function SectionLabel({ label }: { label: string }) {
   return (
-    <button
-      onClick={onToggle}
-      className="w-full flex items-center justify-between px-0 py-1 group"
-    >
-      <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest group-hover:text-slate-400 transition-colors">
-        {label}
-      </p>
-      <span
-        className={`text-slate-600 text-[10px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-      >
-        ▼
-      </span>
-    </button>
+    <p className="px-3 pt-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
+      {label}
+    </p>
   )
 }
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
+  const [mode, setMode] = useState<Mode>('b2c')
 
-  // Collapsible section states — persisted in localStorage
-  const [open, setOpen] = useState<Record<SectionKey, boolean>>({
-    commandes: true,
-    b2b: true,
-    content: true,
-  })
-
+  // Persist mode in localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('buddy_sidebar_open')
-      if (saved) setOpen(JSON.parse(saved))
+      const saved = localStorage.getItem('buddy_sidebar_mode') as Mode | null
+      if (saved === 'b2c' || saved === 'b2b') setMode(saved)
     } catch {}
   }, [])
 
-  const toggle = (key: SectionKey) => {
-    setOpen((prev) => {
-      const next = { ...prev, [key]: !prev[key] }
-      try { localStorage.setItem('buddy_sidebar_open', JSON.stringify(next)) } catch {}
-      return next
-    })
+  const switchMode = (m: Mode) => {
+    setMode(m)
+    try { localStorage.setItem('buddy_sidebar_mode', m) } catch {}
   }
 
   const handleSignOut = () => {
@@ -114,6 +91,7 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-white flex flex-col z-50 shadow-xl">
+
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10">
         <div className="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center text-lg font-bold shadow">
@@ -125,52 +103,66 @@ export default function Sidebar() {
         </div>
       </div>
 
+      {/* Mode switcher */}
+      <div className="px-4 pt-4">
+        <div className="flex rounded-lg bg-white/5 p-1 gap-1">
+          <button
+            onClick={() => switchMode('b2c')}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              mode === 'b2c'
+                ? 'bg-indigo-600 text-white shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            👤 B2C
+          </button>
+          <button
+            onClick={() => switchMode('b2b')}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              mode === 'b2b'
+                ? 'bg-indigo-600 text-white shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🏢 B2B
+          </button>
+        </div>
+      </div>
+
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">
-        {/* Main */}
-        {mainItems.map((item) => (
-          <NavLink key={item.href} {...item} />
-        ))}
+      <nav className="flex-1 px-3 py-2 overflow-y-auto">
 
-        {/* ── Précommandes ── */}
-        <div className="pt-4 pb-1 px-3">
-          <SectionHeader label="Précommandes" open={open.commandes} onToggle={() => toggle('commandes')} />
-        </div>
-        {open.commandes && (
-          <div className="space-y-1">
-            {commandesItems.map((item) => (
-              <NavLink key={item.href} {...item} />
-            ))}
-          </div>
+        {mode === 'b2c' && (
+          <>
+            <SectionLabel label="Opérations" />
+            <div className="space-y-0.5">
+              {b2cMain.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+
+            <div className="border-t border-white/10 mt-4" />
+
+            <SectionLabel label="Contenu & SEO" />
+            <div className="space-y-0.5">
+              {b2cContent.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+          </>
         )}
 
-        {/* ── B2B & Distribution ── */}
-        <div className="pt-4 pb-1 px-3">
-          <div className="border-t border-white/10 pt-3">
-            <SectionHeader label="B2B & Distribution" open={open.b2b} onToggle={() => toggle('b2b')} />
-          </div>
-        </div>
-        {open.b2b && (
-          <div className="space-y-1">
-            {b2bItems.map((item) => (
-              <NavLink key={item.href} {...item} />
-            ))}
-          </div>
+        {mode === 'b2b' && (
+          <>
+            <SectionLabel label="Ventes & Distribution" />
+            <div className="space-y-0.5">
+              {b2bItems.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+          </>
         )}
 
-        {/* ── Contenu & SEO ── */}
-        <div className="pt-4 pb-1 px-3">
-          <div className="border-t border-white/10 pt-3">
-            <SectionHeader label="Contenu & SEO" open={open.content} onToggle={() => toggle('content')} />
-          </div>
-        </div>
-        {open.content && (
-          <div className="space-y-1">
-            {contentItems.map((item) => (
-              <NavLink key={item.href} {...item} />
-            ))}
-          </div>
-        )}
       </nav>
 
       {/* Bottom */}
@@ -193,6 +185,7 @@ export default function Sidebar() {
           {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
         </button>
       </div>
+
     </aside>
   )
 }
