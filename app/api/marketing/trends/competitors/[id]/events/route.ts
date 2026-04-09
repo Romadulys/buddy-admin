@@ -3,13 +3,14 @@ import { listCompetitorEvents } from '@/lib/marketing/trends'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params
     const { searchParams } = new URL(req.url)
     const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : 50
 
-    const data = await listCompetitorEvents(params.id, limit)
+    const data = await listCompetitorEvents(id, limit)
     return NextResponse.json(data)
   } catch (err: any) {
     return NextResponse.json({ error: err.message ?? 'Erreur serveur' }, { status: 500 })

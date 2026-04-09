@@ -3,10 +3,11 @@ import { listAdGroupsByCampaign, createAdGroup } from '@/lib/marketing/sea'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const data = await listAdGroupsByCampaign(params.id)
+    const { id } = await params
+    const data = await listAdGroupsByCampaign(id)
     return NextResponse.json(data)
   } catch (err: any) {
     return NextResponse.json({ error: err.message ?? 'Erreur serveur' }, { status: 500 })
@@ -15,9 +16,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
 
     if (!body.name) {
@@ -28,7 +30,7 @@ export async function POST(
     }
 
     const created = await createAdGroup({
-      campaign_id:        params.id,
+      campaign_id:        id,
       google_adgroup_id:  body.google_adgroup_id ?? null,
       name:               body.name,
       keywords:           body.keywords ?? [],

@@ -3,10 +3,11 @@ import { listAdSetsByCampaign, createAdSet } from '@/lib/marketing/social-ads'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const data = await listAdSetsByCampaign(params.id)
+    const { id } = await params
+    const data = await listAdSetsByCampaign(id)
     return NextResponse.json(data)
   } catch (err: any) {
     return NextResponse.json({ error: err.message ?? 'Erreur serveur' }, { status: 500 })
@@ -15,9 +16,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
 
     if (!body.name) {
@@ -28,7 +30,7 @@ export async function POST(
     }
 
     const created = await createAdSet({
-      campaign_id:        params.id,
+      campaign_id:        id,
       platform_adset_id:  body.platform_adset_id ?? null,
       name:               body.name,
       audience:           body.audience ?? {},

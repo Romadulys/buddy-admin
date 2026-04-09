@@ -3,11 +3,12 @@ import { updateCreative, deleteCreative } from '@/lib/marketing/social-ads'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
-    const updated = await updateCreative(params.id, body)
+    const updated = await updateCreative(id, body)
     return NextResponse.json(updated)
   } catch (err: any) {
     return NextResponse.json({ error: err.message ?? 'Erreur serveur' }, { status: 500 })
@@ -16,10 +17,11 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await deleteCreative(params.id)
+    const { id } = await params
+    await deleteCreative(id)
     return NextResponse.json({ success: true })
   } catch (err: any) {
     return NextResponse.json({ error: err.message ?? 'Erreur serveur' }, { status: 500 })
