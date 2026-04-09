@@ -31,6 +31,20 @@ const b2bItems = [
   { href: '/b2b/simulator',  label: 'Simulateur',        icon: '🧮' },
 ]
 
+const marketingItems = [
+  { href: '/marketing/inbox',       label: 'Inbox',        icon: '📥' },
+  { href: '/marketing/content',     label: 'Content',      icon: '📝' },
+  { href: '/marketing/seo',         label: 'SEO',          icon: '🔍' },
+  { href: '/marketing/sea',         label: 'SEA',          icon: '💰' },
+  { href: '/marketing/social',      label: 'Social',       icon: '📱' },
+  { href: '/marketing/social-ads',  label: 'Social Ads',   icon: '📢' },
+  { href: '/marketing/analytics',   label: 'Analytics',    icon: '📊' },
+  { href: '/marketing/trends',      label: 'Veille',       icon: '🔭' },
+  { href: '/marketing/brand',       label: 'Brand',        icon: '🎨' },
+  { href: '/marketing/agents',      label: 'Agents',       icon: '🤖' },
+  { href: '/marketing/platforms',   label: 'Connexions',   icon: '🔌' },
+]
+
 type Mode = 'b2c' | 'b2b'
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -162,6 +176,15 @@ export default function Sidebar() {
             </div>
           </>
         )}
+
+        {/* Marketing — always visible */}
+        <div className="border-t border-white/10 mt-4" />
+        <SectionLabel label="Marketing" />
+        <div className="space-y-0.5">
+          {marketingItems.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </div>
 
       </nav>
 
