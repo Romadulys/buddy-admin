@@ -45,12 +45,12 @@ INSERT INTO brand_guidelines (section, content) VALUES
   "name": "Buddy",
   "tagline": "Tes mots prennent leur envol",
   "mission": "Communication sans ecran pour les enfants de 4 a 8 ans",
-  "target": "Parents d'\''enfants de 4 a 8 ans",
+  "target": "Parents d''enfants de 4 a 8 ans",
   "positioning": "Buddy est le premier appareil de communication pour enfants qui remplace le smartphone par une experience physique, ludique et bienveillante. Nous permettons aux familles de rester connectees sans exposer les enfants aux dangers des ecrans.",
   "values": ["Bienveillance", "Simplicite", "Securite", "Connexion familiale", "Autonomie progressive"]
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 2. Colors
 ('colors', '{
@@ -70,7 +70,7 @@ ON CONFLICT (section) DO NOTHING,
   ]
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 3. Typography
 ('typography', '{
@@ -101,20 +101,20 @@ ON CONFLICT (section) DO NOTHING,
   }
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 4. Tone
 ('tone', '{
-  "personality": "Buddy parle comme un ami bienveillant de la famille — jamais condescendant, jamais anxiogene. Notre voix est celle d'\''un parent moderne qui comprend les enjeux du numerique et propose des solutions concretes et positives.",
+  "personality": "Buddy parle comme un ami bienveillant de la famille — jamais condescendant, jamais anxiogene. Notre voix est celle d''un parent moderne qui comprend les enjeux du numerique et propose des solutions concretes et positives.",
   "do": ["Chaleureux", "Rassurant", "Simple", "Ludique", "Positif"],
   "dont": ["Technique", "Anxiogene", "Condescendant", "Agressif"],
   "examples": [
     {"type": "do",   "text": "Restez connectes avec vos enfants, sans les ecrans"},
-    {"type": "dont", "text": "Protegez vos enfants des dangers d'\''internet"}
+    {"type": "dont", "text": "Protegez vos enfants des dangers d''internet"}
   ]
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 5. Vocabulary
 ('vocabulary', '{
@@ -130,7 +130,7 @@ ON CONFLICT (section) DO NOTHING,
   "never_use": ["surveillance", "tracker", "espionner", "controle total", "espionnage"]
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 6. Logos
 ('logos', '{
@@ -145,13 +145,13 @@ ON CONFLICT (section) DO NOTHING,
     "forbidden": [
       "Ne pas deformer ou etirer le logo",
       "Ne pas changer les couleurs du logo principal",
-      "Ne pas ajouter d'\''effets (ombre, contour, rotation)",
+      "Ne pas ajouter d''effets (ombre, contour, rotation)",
       "Ne pas placer sur un fond qui nuit a la lisibilite"
     ]
   }
 }')
 
-ON CONFLICT (section) DO NOTHING,
+,
 
 -- 7. Rules
 ('rules', '{
@@ -160,13 +160,13 @@ ON CONFLICT (section) DO NOTHING,
     "Conserver une hierarchie visuelle claire : titre > sous-titre > corps",
     "Privilegier les visuels avec des enfants heureux en contexte naturel",
     "Ne jamais utiliser de stock photos generiques sans approbation",
-    "Assurer un contraste minimum AA pour l'\''accessibilite (WCAG 2.1)"
+    "Assurer un contraste minimum AA pour l''accessibilite (WCAG 2.1)"
   ],
   "content": [
-    "Chaque visuel doit etre teste aupres d'\''au moins un parent de la cible",
+    "Chaque visuel doit etre teste aupres d''au moins un parent de la cible",
     "Le message principal doit etre comprehensible en moins de 5 secondes",
     "Toujours inclure un CTA clair et unique par communication",
-    "Les visuels produit doivent montrer Buddy en contexte d'\''usage reel",
+    "Les visuels produit doivent montrer Buddy en contexte d''usage reel",
     "Les communications B2B (ecoles, mutuelles) adoptent un ton plus formel mais gardent la bienveillance",
     "Relire systematiquement pour supprimer tout jargon technique non explique"
   ]
