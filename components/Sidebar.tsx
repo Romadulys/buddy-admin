@@ -45,7 +45,7 @@ const marketingItems = [
   { href: '/marketing/platforms',   label: 'Connexions',   icon: '🔌' },
 ]
 
-type Mode = 'b2c' | 'b2b'
+type Mode = 'b2c' | 'b2b' | 'marketing'
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ export default function Sidebar() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('buddy_sidebar_mode') as Mode | null
-      if (saved === 'b2c' || saved === 'b2b') setMode(saved)
+      if (saved === 'b2c' || saved === 'b2b' || saved === 'marketing') setMode(saved)
     } catch {}
   }, [])
 
@@ -140,6 +140,16 @@ export default function Sidebar() {
           >
             🏢 B2B
           </button>
+          <button
+            onClick={() => switchMode('marketing')}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              mode === 'marketing'
+                ? 'bg-indigo-600 text-white shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🚀 Mktg
+          </button>
         </div>
       </div>
 
@@ -177,14 +187,43 @@ export default function Sidebar() {
           </>
         )}
 
-        {/* Marketing — always visible */}
-        <div className="border-t border-white/10 mt-4" />
-        <SectionLabel label="Marketing" />
-        <div className="space-y-0.5">
-          {marketingItems.map((item) => (
-            <NavLink key={item.href} {...item} />
-          ))}
-        </div>
+        {mode === 'marketing' && (
+          <>
+            <SectionLabel label="Commande" />
+            <div className="space-y-0.5">
+              {marketingItems.slice(0, 1).map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+
+            <div className="border-t border-white/10 mt-4" />
+
+            <SectionLabel label="Production" />
+            <div className="space-y-0.5">
+              {marketingItems.slice(1, 6).map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+
+            <div className="border-t border-white/10 mt-4" />
+
+            <SectionLabel label="Data & Veille" />
+            <div className="space-y-0.5">
+              {marketingItems.slice(6, 8).map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+
+            <div className="border-t border-white/10 mt-4" />
+
+            <SectionLabel label="Configuration" />
+            <div className="space-y-0.5">
+              {marketingItems.slice(8).map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </div>
+          </>
+        )}
 
       </nav>
 
